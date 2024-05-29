@@ -48,13 +48,15 @@ exports.modifyBook = (req, res, next) => {
     delete bookObject._userId;
     Book.findOne({_id: req.params.id})
     .then((book) => {
-        if (book.userId != req.auth.userId) {
-            res.status(401).json({message: 'Non-autorisé !'});
-        } else {
-            Book.updateOne({_id: req.params.id}, {...bookObject, _id: req.params.id}) 
-            .then(() => res.status(200).json({message: 'Livre modifié !'}))
-            .catch(error => res.status(401).json({error}));
+        if(!book){
+          return res.status(404).json({ message: 'Livre non trouvé !'});
         }
+        if (book.userId != req.auth.userId) {
+            res.status(403).json({message: 'Requête non autorisée !'});
+        } 
+        Book.updateOne({_id: req.params.id}, {...bookObject, _id: req.params.id}) 
+        .then(() => res.status(200).json({message: 'Livre modifié !'}))
+        .catch(error => res.status(401).json({error}));
     })
     .catch((error) => {
         res.status(400).json({error});
@@ -115,7 +117,8 @@ exports.getThreeBestBooks = (req, res, next) => {
 
 exports.giveRating = async (req, res, next) => {
   try {
-    const { userId, rating } = req.body;
+    const userId = req.auth.userId;
+    const { rating } = req.body;
     if (rating < 1 || rating > 5) {
       return res.status(400).json({ error: "Rating must be between 1 and 5." });
     }
