@@ -8,7 +8,6 @@ const path = require('path');
 const app = express();
 const dbUsername = process.env.DB_USERNAME;
 const dbPassword = process.env.DB_PASSWORD;
-console.log(process.env);
 
 mongoose.connect(`mongodb+srv://${dbUsername}:${dbPassword}@clusterfirstone.zwko5fr.mongodb.net/?retryWrites=true&w=majority&appName=ClusterFirstOne`)
     .then(() => {
